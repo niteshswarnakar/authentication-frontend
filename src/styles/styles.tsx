@@ -26,7 +26,7 @@ const useStyles = makeStyles({
     alignItems: "center",
     justifyContent: "center",
     width: "30%",
-    height: "40vh",
+    height: "50vh",
     margin: "0 auto",
   },
   gridContainer: {
@@ -34,6 +34,43 @@ const useStyles = makeStyles({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
+  },
+  SingupformContainer: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "12px",
+    alignItems: "center",
+    width: "100%",
+  },
+  SingupformDiv: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "30%",
+    height: "60vh",
+    margin: "0 auto",
+  },
+  SingupgridContainer: {
+    width: "100%",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  DashboardContainer: {
+    height: "50vh",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  errorMessage: {
+    color: "red",
+    alignSelf: "flex-start",
+    fontSize: "14px",
+    marginTop: "-4px",
+    marginLeft: "4px",
+  },
+  emailNotFoundMessage: {
+    marginTop: "-8px",
   },
 });
 
