@@ -24,7 +24,6 @@ const Header = () => {
           </Link>
 
           <Link to="/signup" className={classes.linkDecoration}>
-            {" "}
             <Typography color="white" variant="h6">
               Sign Up
             </Typography>

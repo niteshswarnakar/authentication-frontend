@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
 import {
   Typography,
   Grid,
@@ -11,42 +12,88 @@ import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 
 import useStyles from "../styles/styles";
-import { Box } from "@mui/system";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import AlertComponent from "../components/AlertComponent";
 
 const Signup = () => {
+  //navigation
   const navigate = useNavigate();
-  const [isLogged, setIsLogged] = useState(
-    Boolean(localStorage.getItem("email"))
-  );
+
+  const [isLogged] = useState<boolean>(Boolean(localStorage.getItem("email")));
+
+  const [emailExist, setEmailExist] = useState<boolean>(false);
+
+  //api end-point of backend
   const url: string = "http://localhost:8000/api/users/signup";
+
+  // makeStyles of material ui
   const classes = useStyles();
+
+  const userSchema = yup.object().shape({
+    email: yup.string().email("Enter a proper email").required(),
+    password: yup
+      .string()
+      .min(6)
+      .max(50)
+      .matches(/[a-z]/, "Password must contain at least one lowercase letter")
+      .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
+      .matches(/[0-9]/, "Password must contain at least one number")
+      .matches(
+        /[!@#$%^&*(),.?":{}|<>]/,
+        "Password must contain at least one special character"
+      )
+      .required(),
+    confirmPassword: yup
+      .string()
+      .oneOf([yup.ref("password"), null], "Password should match"),
+  });
+
+  //form validation ko lagi react-hook-form
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({ resolver: yupResolver(userSchema) });
 
   useEffect(() => {
     if (isLogged) navigate("/");
   });
 
-  const submitHandler = async (event: React.FormEvent) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
+  const submitHandler = async (data) => {
+    setEmailExist(false);
+    // e.preventDefault();
+    console.log("submit handler ran - ", data);
     const requestBody = {
-      email: data.get("email"),
-      password: data.get("password"),
+      email: data.email,
+      password: data.password,
     };
 
-    console.log({ requestBody });
+    console.log(requestBody);
     try {
       const { data } = await axios.post(url, requestBody);
       console.log({ data });
-      localStorage.setItem("email", data.email);
-      localStorage.setItem("token", data.token);
       navigate("/login");
     } catch (err) {
+      setEmailExist(true);
+      reset({
+        password: "",
+        confirmPassword: "",
+      });
       console.log({ err });
     }
   };
 
   return (
     <>
+      {emailExist && (
+        <AlertComponent
+          severity="error"
+          message="Email already exists"
+          resetHandler={setEmailExist}
+        />
+      )}
       <CssBaseline />
       <main>
         <Container className={classes.marginTop} maxWidth="sm">
@@ -54,31 +101,47 @@ const Signup = () => {
             Signup Page
           </Typography>
         </Container>
-        <Grid className={classes.gridContainer} container>
-          <Grid className={classes.formDiv} item xs={12} md={6}>
-            <Box
-              className={classes.formContainer}
-              component="form"
-              onSubmit={submitHandler}>
+        <Grid className={classes.SingupgridContainer} container>
+          <Grid className={classes.SingupformDiv} item xs={12} md={6}>
+            <form
+              className={classes.SingupformContainer}
+              onSubmit={handleSubmit(submitHandler)}>
               <TextField
                 fullWidth
                 required
                 id="email"
                 label="email address"
-                name="email"
                 autoFocus
                 className={classes.inputField}
+                {...register("email")}
               />
+              <p className={classes.errorMessage}>
+                {errors.email && errors.email?.message}
+              </p>
+              <span
+                className={`${classes.emailExistMessage} ${classes.errorMessage}`}></span>
               <TextField
                 fullWidth
                 required
                 id="password"
                 label="password"
-                name="password"
-                autoFocus
+                {...register("password")}
                 type="password"
                 className={classes.inputField}
               />
+              <p className={classes.errorMessage}>{errors.password?.message}</p>
+              <TextField
+                fullWidth
+                required
+                id="confirmPassword"
+                label="confirm password"
+                type="password"
+                {...register("confirmPassword")}
+                className={classes.inputField}
+              />
+              <p className={classes.errorMessage}>
+                {errors.confirmPassword?.message}
+              </p>
               <Button variant="contained" type="submit">
                 Sign Up
               </Button>
@@ -87,12 +150,14 @@ const Signup = () => {
               </Grid>
               <Typography variant="body2" color="text.secondary" align="center">
                 {"Copyright © "}
-                <Link color="inherit" to="https://mui.com/">
+                <Link
+                  color="inherit"
+                  to="https://github.com/niteshswarnakar/user-authentication">
                   user authentication
                 </Link>
                 {new Date().getFullYear()}
               </Typography>
-            </Box>
+            </form>
           </Grid>
         </Grid>
       </main>

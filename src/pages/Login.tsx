@@ -12,13 +12,15 @@ import { useNavigate, Link } from "react-router-dom";
 
 import useStyles from "../styles/styles";
 import { Box } from "@mui/system";
+import AlertComponent from "../components/AlertComponent";
 
 const Login = () => {
   const navigate = useNavigate();
   const [isLogged, setIsLogged] = useState<boolean>(
     Boolean(localStorage.getItem("email"))
   );
-
+  const [isSignedUp, setIsSignedUp] = useState<boolean>(false);
+  const [isEmailNotFound, setIsEmailNotFound] = useState<boolean>(false);
   useEffect(() => {
     if (isLogged) navigate("/");
   });
@@ -43,13 +45,20 @@ const Login = () => {
       setIsLogged(true);
       navigate("/");
     } catch (err) {
+      setIsEmailNotFound(true);
       console.log({ err });
     }
   };
 
   return (
     <>
-      {" "}
+      {isSignedUp && (
+        <AlertComponent
+          severity="success"
+          message="Successfully signed up"
+          resetHandler={setIsSignedUp}
+        />
+      )}
       <CssBaseline />
       <main>
         <Container className={classes.marginTop} maxWidth="sm">
@@ -70,18 +79,25 @@ const Login = () => {
                 label="email address"
                 name="email"
                 autoFocus
+                type="email"
                 className={classes.inputField}
               />
+
               <TextField
                 fullWidth
                 required
                 id="password"
                 label="password"
                 name="password"
-                autoFocus
                 type="password"
                 className={classes.inputField}
               />
+              {isEmailNotFound && (
+                <span
+                  className={`${classes.errorMessage} ${classes.emailNotFoundMessage}`}>
+                  Invalid email or password
+                </span>
+              )}
               <Button variant="contained" type="submit">
                 Login
               </Button>
@@ -90,7 +106,9 @@ const Login = () => {
               </Grid>
               <Typography variant="body2" color="text.secondary" align="center">
                 {"Copyright © "}
-                <Link color="inherit" to="https://mui.com/">
+                <Link
+                  color="inherit"
+                  to="https://github.com/niteshswarnakar/user-authentication">
                   user authentication
                 </Link>
                 {new Date().getFullYear()}
