@@ -17,7 +17,7 @@ const useStyles = makeStyles({
   formContainer: {
     display: "flex",
     flexDirection: "column",
-    gap: "32px",
+    gap: "12px",
     alignItems: "center",
     width: "100%",
   },
@@ -61,6 +61,11 @@ const useStyles = makeStyles({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
+  },
+  DashboardDiv: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "34px",
   },
   errorMessage: {
     color: "red",

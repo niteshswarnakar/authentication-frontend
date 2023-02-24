@@ -1,15 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Typography, AppBar, Toolbar, CssBaseline } from "@mui/material";
 import { Link } from "react-router-dom";
 import useStyles from "../styles/styles";
 const Header = () => {
-  const [isLogged, setIsLogged] = useState<boolean>();
-
-  useEffect(() => {
-    setIsLogged(Boolean(localStorage.getItem("email")));
-  }, []);
-
-  console.log({ isLogged });
+  const [isLogged, setIsLogged] = useState<boolean>(
+    Boolean(localStorage.getItem("email"))
+  );
 
   const classes = useStyles();
   return (

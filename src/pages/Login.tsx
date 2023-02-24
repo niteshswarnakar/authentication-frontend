@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 import {
   Typography,
   Grid,
@@ -7,46 +10,66 @@ import {
   TextField,
   Button,
 } from "@mui/material";
-import axios from "axios";
-import { useNavigate, Link } from "react-router-dom";
-
-import useStyles from "../styles/styles";
 import { Box } from "@mui/system";
+import axios from "axios";
+import { useNavigate, Link, useLocation } from "react-router-dom";
+import useStyles from "../styles/styles";
 import AlertComponent from "../components/AlertComponent";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { state } = useLocation();
+
+  // const { signedUp } = state;
   const [isLogged, setIsLogged] = useState<boolean>(
     Boolean(localStorage.getItem("email"))
   );
-  const [isSignedUp, setIsSignedUp] = useState<boolean>(false);
+
+  const [isSignedUp, setIsSignedUp] = useState<boolean>(
+    state?.signedUp ? state.signedUp : false
+  );
+
   const [isEmailNotFound, setIsEmailNotFound] = useState<boolean>(false);
-  useEffect(() => {
-    if (isLogged) navigate("/");
+
+  const userSchema = yup.object().shape({
+    email: yup.string().email("Enter a proper email").required(),
+    password: yup.string().required(),
   });
 
+  // form validation react-hook-form
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({ resolver: yupResolver(userSchema) });
+
+  useEffect(() => {
+    if (isLogged) navigate("/", { state: { loggedIn: true } });
+  });
+
+  // api end point for backend
   const url: string = "http://localhost:8000/api/users/signin";
+
+  //classes for styling
   const classes = useStyles();
 
-  const submitHandler = async (event: React.FormEvent) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
+  const submitHandler = async (data) => {
+    setIsEmailNotFound(false);
     const requestBody = {
-      email: data.get("email"),
-      password: data.get("password"),
+      email: data.email,
+      password: data.password,
     };
 
-    console.log({ requestBody });
     try {
       const { data } = await axios.post(url, requestBody);
-      console.log({ data });
       localStorage.setItem("email", data.email);
       localStorage.setItem("token", data.token);
       setIsLogged(true);
       navigate("/");
+      window.location.reload();
     } catch (err) {
       setIsEmailNotFound(true);
-      console.log({ err });
     }
   };
 
@@ -68,27 +91,28 @@ const Login = () => {
         </Container>
         <Grid className={classes.gridContainer} container>
           <Grid className={classes.formDiv} item xs={12} md={6}>
-            <Box
+            <form
               className={classes.formContainer}
-              component="form"
-              onSubmit={submitHandler}>
+              onSubmit={handleSubmit(submitHandler)}>
               <TextField
                 fullWidth
                 required
                 id="email"
                 label="email address"
-                name="email"
                 autoFocus
-                type="email"
                 className={classes.inputField}
+                {...register("email")}
               />
+              <p className={classes.errorMessage}>
+                {errors.email && errors.email?.message}
+              </p>
 
               <TextField
                 fullWidth
                 required
                 id="password"
                 label="password"
-                name="password"
+                {...register("password")}
                 type="password"
                 className={classes.inputField}
               />
@@ -113,7 +137,7 @@ const Login = () => {
                 </Link>
                 {new Date().getFullYear()}
               </Typography>
-            </Box>
+            </form>
           </Grid>
         </Grid>
       </main>

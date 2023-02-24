@@ -10,7 +10,6 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
-
 import useStyles from "../styles/styles";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -30,11 +29,12 @@ const Signup = () => {
   // makeStyles of material ui
   const classes = useStyles();
 
+  // user schema for form validation
   const userSchema = yup.object().shape({
     email: yup.string().email("Enter a proper email").required(),
     password: yup
       .string()
-      .min(6)
+      .min(8)
       .max(50)
       .matches(/[a-z]/, "Password must contain at least one lowercase letter")
       .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
@@ -63,25 +63,20 @@ const Signup = () => {
 
   const submitHandler = async (data) => {
     setEmailExist(false);
-    // e.preventDefault();
-    console.log("submit handler ran - ", data);
     const requestBody = {
       email: data.email,
       password: data.password,
     };
 
-    console.log(requestBody);
     try {
       const { data } = await axios.post(url, requestBody);
-      console.log({ data });
-      navigate("/login");
+      navigate("/login", { state: { signedUp: true } });
     } catch (err) {
       setEmailExist(true);
       reset({
         password: "",
         confirmPassword: "",
       });
-      console.log({ err });
     }
   };
 
@@ -119,7 +114,7 @@ const Signup = () => {
                 {errors.email && errors.email?.message}
               </p>
               <span
-                className={`${classes.emailExistMessage} ${classes.errorMessage}`}></span>
+                className={`${classes.emailNotFoundMessage} ${classes.errorMessage}`}></span>
               <TextField
                 fullWidth
                 required
