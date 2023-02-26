@@ -24,7 +24,8 @@ const Signup = () => {
   const [emailExist, setEmailExist] = useState<boolean>(false);
 
   //api end-point of backend
-  const url: string = "http://localhost:8000/api/users/signup";
+  const url: string =
+    "https://user-authentication-git-main-niteshswarnakar.vercel.app/api/users/signup";
 
   // makeStyles of material ui
   const classes = useStyles();
@@ -69,7 +70,7 @@ const Signup = () => {
     };
 
     try {
-      const { data } = await axios.post(url, requestBody);
+      await axios.post(url, requestBody);
       navigate("/login", { state: { signedUp: true } });
     } catch (err) {
       setEmailExist(true);

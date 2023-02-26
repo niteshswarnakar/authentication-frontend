@@ -10,7 +10,6 @@ import {
   TextField,
   Button,
 } from "@mui/material";
-import { Box } from "@mui/system";
 import axios from "axios";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import useStyles from "../styles/styles";
@@ -40,7 +39,6 @@ const Login = () => {
   const {
     register,
     handleSubmit,
-    reset,
     formState: { errors },
   } = useForm({ resolver: yupResolver(userSchema) });
 
@@ -49,7 +47,8 @@ const Login = () => {
   });
 
   // api end point for backend
-  const url: string = "http://localhost:8000/api/users/signin";
+  const url: string =
+    "https://user-authentication-git-main-niteshswarnakar.vercel.app/api/users/signin";
 
   //classes for styling
   const classes = useStyles();
