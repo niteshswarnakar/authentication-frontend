@@ -26,7 +26,7 @@ const Dashboard = () => {
             <Typography variant="h2">Welcome to the Dashboard</Typography>
             <Typography variant="h4">
               Hey {localStorage.getItem("email")?.split("@")[0]}, You are
-              athenticated
+              authenticated
             </Typography>
           </Box>
         ) : (
